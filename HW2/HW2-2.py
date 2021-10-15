@@ -29,7 +29,7 @@ if __name__ == "__main__":
     for x in range(len(data)):
         a = 0
         b = 0
-        print("case: %s: %s"%(x, data[x]))
+        print("case %s: %s"%(x, data[x]))
         for pos in range(len(data[x])):
             if float(data[x][pos]) == 1:
                 a+=1
@@ -40,8 +40,8 @@ if __name__ == "__main__":
         theta = a/(a+b)
         likelihood = math.factorial(a+b)/(math.factorial(a)*math.factorial(b)) * (theta**a) * ((1-theta)**b)
         print("likelihood: ",likelihood)
-        print("Beta prior: a:%s, b:%s"%(global_a_prior,global_b_prior))
-        print("Beta posterior: a:%s, b:%s"%(global_a_posterior,global_b_posterior))
+        print("Beta prior:     a = %s  b = %s"%(global_a_prior,global_b_prior))
+        print("Beta posterior: a = %s  b = %s"%(global_a_posterior,global_b_posterior))
         global_a_prior = global_a_posterior
         global_b_prior = global_b_posterior
         print()
