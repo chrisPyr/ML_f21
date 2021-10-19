@@ -28,7 +28,7 @@ def SeqEsti(m,s):
             var = (sumsq - (sum**2) / itr) / (itr-1)
         print("Mean: {}".format(mean), end = ' ')
         print("Variance: {}".format(var))
-        if (abs(p_mean - mean) <= 0.001) and (abs(p_var - var)<=0.001):
+        if (abs(p_mean - mean) <= 0.01) and (abs(p_var - var)<=0.01):
             break
         p_mean = mean
         p_var = var
