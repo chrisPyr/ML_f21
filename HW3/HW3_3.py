@@ -66,7 +66,8 @@ def BaysianLinearRegression(b, a, w, n):
         print("Posterior variance:")
         printPosVar(pos_var)
         predictive_mean = np.matmul(designMatrix, prior_mean)
-        predictive_var = 1/a + np.matmul(designMatrix, np.matmul(pos_var,designMatrix.transpose()))
+        #predictive_var = 1/a + np.matmul(designMatrix, np.matmul(pos_var,designMatrix.transpose()))
+        predictive_var = 1/a + np.matmul(designMatrix, np.matmul(np.linalg.inv(prior_cov),designMatrix.transpose()))
         print()
         print("Predictive distribution ~ N({:.5f}, {:.5f})".format(predictive_mean[0,0], predictive_var[0,0]))
         print("------------------------------------------------------")
@@ -95,6 +96,13 @@ def calResulty(x,m):
     y = np.array(y)
     return y
 
+def calVaronx(print_var, i, deMats):
+    tmp_var = np.zeros(100)
+    for k in range(100):
+        tmp_var[k] = print_var[0] + deMats[k].dot(print_var[i].dot(deMats[k].T))
+    return tmp_var
+
+
 def visualize(print_var,print_mean, data_x, data_y):
     plt.subplot(221)
     plt.title("Ground Truth")
@@ -114,28 +122,22 @@ def visualize(print_var,print_mean, data_x, data_y):
 
     plt.subplot(222)
     plt.title("Predictive Result")
-    var = np.zeros(100)
-    for k in range(100):
-        var[k] = print_var[0] + deMats[k].dot(print_var[3].dot(deMats[k].T))
     y = calResulty(x, print_mean[3])
+    var = calVaronx(print_var,3,deMats)
     plt.scatter(data_x, data_y, s = 7.0)
     drawResult(x,y,var)
 
     plt.subplot(223)
     plt.title("After 10 incomes")
-    var = np.zeros(100)
-    for k in range(100):
-        var[k] = print_var[0] + deMats[k].dot(print_var[1].dot(deMats[k].T))
     y = calResulty(x, print_mean[1])
+    var = calVaronx(print_var,1,deMats)
     plt.scatter(data_x[:10], data_y[:10], s = 7.0)
     drawResult(x,y,var)
 
     plt.subplot(224)
     plt.title("After 50 incomes")
-    var = np.zeros(100)
-    for k in range(100):
-        var[k] = print_var[0] + deMats[k].dot(print_var[2].dot(deMats[k].T))
     y = calResulty(x, print_mean[2])
+    var = calVaronx(print_var,2,deMats)
     plt.scatter(data_x[:50], data_y[:50], s = 7.0)
     drawResult(x,y,var)
     plt.show()
