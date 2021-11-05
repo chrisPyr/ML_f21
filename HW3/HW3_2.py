@@ -20,12 +20,13 @@ def SeqEsti(m,s):
         sumsq += data**2
         print("Add data point: {}".format(data))
         # update mean for new data
-        mean = sum / itr
+        mean = p_mean + (data - p_mean)/ itr
         #update variance for new data
         if itr == 1:
             var = 0
         else:
-            var = (sumsq - (sum**2) / itr) / (itr-1)
+            #var = (sumsq - (sum**2) / itr) / (itr-1)
+            var = p_var + ((data - p_mean)*(data - mean) - p_var)/itr
         print("Mean: {}".format(mean), end = ' ')
         print("Variance: {}".format(var))
         if (abs(p_mean - mean) <= 0.01) and (abs(p_var - var)<=0.01):

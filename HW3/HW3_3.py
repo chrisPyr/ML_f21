@@ -77,7 +77,7 @@ def BaysianLinearRegression(b, a, w, n):
             print_var.append(pos_var)
             print_mean.append(pos_mean)
 
-        if (abs(pos_mean - prior_mean) < 0.00001).all() and itr > 50:
+        if (abs(pos_mean - prior_mean) < 0.00001).all() and  abs((pos_var - np.linalg.inv(prior_cov)) < 0.00001).all() and itr > 50:
             print_var.append(pos_var)
             print_mean.append(pos_mean)
             break
@@ -99,7 +99,7 @@ def calResulty(x,m):
 def calVaronx(print_var, i, deMats):
     tmp_var = np.zeros(100)
     for k in range(100):
-        tmp_var[k] = print_var[0] + deMats[k].dot(print_var[i].dot(deMats[k].T))
+        tmp_var[k] = print_var[0]+ deMats[k].dot(print_var[i].dot(deMats[k].T))
     return tmp_var
 
 
