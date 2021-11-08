@@ -37,14 +37,39 @@ def GradientDescent(Z,Y):
     count = 0
     while True:
         count += 1
-        dJ = np.matmul(Z.transpose(),(Y - expit(np.matmul(Z,w))) )
-        if (abs(dJ) < 0.00001).all() or count >= 10000:
+        dJ = np.matmul(Z.transpose(),(Y - expit(np.matmul(Z, w))) )
+        if (abs(dJ) < 0.000001).all() or count >= 10000000:
             return w
         w = w + dJ
+
+def NewtonMethod(Z,Y):
+    w =  np.random.rand(3,1)
+    count = 0
+    while True:
+        count+=1
+        prev_w = w
+        dJ = np.matmul(Z.transpose(),(Y - expit(np.matmul(Z, w))) )
+        diagonal = np.zeros((2*args.N,2*args.N))
+        for i in range(2*args.N):
+            p = np.matmul(Z[i],w)
+            diagonal[i,i] = p*(1-p)
+        Hessian = np.matmul(Z.transpose(),np.matmul(diagonal,Z))
+        try:
+            w = w - np.matmul(np.linalg.inv(Hessian), dJ)
+        except:
+            w = w + dJ
+        if (abs(prev_w - w)< 1e-10).all() or count>=10000:
+            return w
+
 
 def calConfusionMatrix(Z,Y,w,mode):
     if mode == 1:
         print("Gradient Descent:\n")
+        print("w:")
+        for i in range(3):
+            print("{:.10f}".format(w[i][0]))
+    else:
+        print("Newton Method:\n")
         print("w:")
         for i in range(3):
             print("{:.10f}".format(w[i][0]))
@@ -72,13 +97,22 @@ def calConfusionMatrix(Z,Y,w,mode):
     print("In cluster 1 {:6}{}{:19}{}".format(" ",TN," ",FN))
     print("In cluster 2 {:6}{}{:19}{}".format(" ",FP," ",TP))
     #cal sensitivity and specificity
-    print("Sensitivity (successfully predict cluster 1):{}".format(TN/(TN + FP)))
-    print("Specificity (successfully predict cluster 2):{}".format(TP/(TP + FN)))
+    print("Sensitivity (successfully predict cluster 1):{:.5f}".format(TN/(TN + FP)))
+    print("Specificity (successfully predict cluster 2):{:.5f}".format(TP/(TP + FN)))
     return predict
 
-def plotTruth(x1, y1, x2, y2):
-    plt.plot(x1,y1,color = 'red')
-    plt.plot(x2,y2,color = 'blue')
+def Visualization(x1,x2,y1,y2,pred_grad):
+    plt.subplot(131)
+    plt.title("Ground Truth")
+    plt.scatter(x1,y1,color = "red")
+    plt.scatter(x2,y2,color = "blue")
+    plt.subplot(132)
+    plt.title("Gradient Descent")
+    col = np.where(pred_grad[0:args.N,0]==0, "red", "blue")
+    plt.scatter(x1,y1, color = col)
+    col = np.where(pred_grad[args.N:args.N*2,0]==0, "red", "blue")
+    plt.scatter(x2,y2, color = col)
+    plt.show()
 
 
 
@@ -98,7 +132,12 @@ if __name__ == "__main__":
     # y = Bernoulli(f(Z))
     Y = np.zeros((2*args.N,1), dtype = int)
     Y[args.N:2*args.N, 0] = 1
-    w = GradientDescent(Z,Y)
-    pred = calConfusionMatrix(Z,Y,w,1)
+    w_gradient = GradientDescent(Z,Y)
+    w_newton = NewtonMethod(Z,Y)
+    print(w_newton)
+    pred_grad = calConfusionMatrix(Z,Y,w_gradient,1)
+    print()
+    pred_newton = calConfusionMatrix(Z,Y,w_newton,2)
+    Visualization(x1,x2,y1,y2,pred_grad)
 
 
