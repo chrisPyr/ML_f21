@@ -1,3 +1,5 @@
 *.zip
 *.jpg
 __pycache__*
+*ubyte
+*.txt

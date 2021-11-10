@@ -3,7 +3,7 @@ import numpy as np
 import sys
 import random
 import argparse
-from scipy.special import expit
+from scipy.special import expit,expm1
 sys.path.append("../HW3/")
 from HW3_1 import UniGaussian as UniGau
 
@@ -38,24 +38,25 @@ def GradientDescent(Z,Y):
     while True:
         count += 1
         dJ = np.matmul(Z.transpose(),(Y - expit(np.matmul(Z, w))) )
-        if (abs(dJ) < 0.000001).all() or count >= 10000000:
+        if (abs(dJ) < 0.000001).all() or count >= 10000:
             return w
         w = w + dJ
 
 def NewtonMethod(Z,Y):
     w =  np.random.rand(3,1)
     count = 0
+    diagonal = np.zeros((2*args.N,2*args.N))
     while True:
         count+=1
         prev_w = w
         dJ = np.matmul(Z.transpose(),(Y - expit(np.matmul(Z, w))) )
-        diagonal = np.zeros((2*args.N,2*args.N))
         for i in range(2*args.N):
-            p = np.matmul(Z[i],w)
+            p = expit(np.matmul(Z[i],w))
             diagonal[i,i] = p*(1-p)
         Hessian = np.matmul(Z.transpose(),np.matmul(diagonal,Z))
         try:
             w = w - np.matmul(np.linalg.inv(Hessian), dJ)
+            #w = w+ dJ
         except:
             w = w + dJ
         if (abs(prev_w - w)< 1e-10).all() or count>=10000:
@@ -101,7 +102,7 @@ def calConfusionMatrix(Z,Y,w,mode):
     print("Specificity (successfully predict cluster 2):{:.5f}".format(TP/(TP + FN)))
     return predict
 
-def Visualization(x1,x2,y1,y2,pred_grad):
+def Visualization(x1,x2,y1,y2,pred_grad,pred_newton):
     plt.subplot(131)
     plt.title("Ground Truth")
     plt.scatter(x1,y1,color = "red")
@@ -111,6 +112,12 @@ def Visualization(x1,x2,y1,y2,pred_grad):
     col = np.where(pred_grad[0:args.N,0]==0, "red", "blue")
     plt.scatter(x1,y1, color = col)
     col = np.where(pred_grad[args.N:args.N*2,0]==0, "red", "blue")
+    plt.scatter(x2,y2, color = col)
+    plt.subplot(133)
+    plt.title("Newton Method")
+    col = np.where(pred_newton[0:args.N,0]==0, "red", "blue")
+    plt.scatter(x1,y1, color = col)
+    col = np.where(pred_newton[args.N:args.N*2,0]==0, "red", "blue")
     plt.scatter(x2,y2, color = col)
     plt.show()
 
@@ -134,10 +141,9 @@ if __name__ == "__main__":
     Y[args.N:2*args.N, 0] = 1
     w_gradient = GradientDescent(Z,Y)
     w_newton = NewtonMethod(Z,Y)
-    print(w_newton)
     pred_grad = calConfusionMatrix(Z,Y,w_gradient,1)
     print()
     pred_newton = calConfusionMatrix(Z,Y,w_newton,2)
-    Visualization(x1,x2,y1,y2,pred_grad)
+    Visualization(x1,x2,y1,y2,pred_grad,pred_newton)
 
 
