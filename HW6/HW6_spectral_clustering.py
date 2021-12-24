@@ -39,7 +39,6 @@ def outputImage(cluster, img_type, num_of_img):
 
     image = point_color.reshape((100, 100, 3))
     image = Image.fromarray(np.uint8(image))
-    #image.save(os.path.join(args.output_image, img_type+str(num_of_img)+".png"))
     return image
 
 
@@ -79,8 +78,6 @@ def printEigen(matrix_U, clusters):
     for idx in range(len(matrix_U)):
         plt.scatter(matrix_U[idx, 0], matrix_U[idx, 1],
                     color=colors[clusters[idx]])
-        if idx % 1000 == 0:
-            print("hihi")
     plt.savefig(str(pic)+"_eigen_coordinate_"+str(cut)+"_"+str(mode)+".png")
     return
 
@@ -109,19 +106,19 @@ def computeMatrixU(matrix_W, cut_type, num_of_cluster):
     else:
         cut = "normalized"
     # Graph Laplacian L and degree matrix D
-#    matrix_D, matrix_L = Laplacian(matrix_W)
-#    if cut_type == 2:
-#        matrix_D_sym = np.zeros((matrix_D.shape))
-#        for i in range(len(matrix_D)):
-#            matrix_D_sym[i,i] = 1.0 / np.sqrt(matrix_D[i,i])
-#        matrix_L = matrix_D_sym.dot(matrix_L).dot(matrix_D_sym)
-#
-#    eigenvalues, eigenvectors = np.linalg.eig(matrix_L)
-#    eigenvectors = eigenvectors.T
+    matrix_D, matrix_L = Laplacian(matrix_W)
+    if cut_type == 2:
+        matrix_D_sym = np.zeros((matrix_D.shape))
+        for i in range(len(matrix_D)):
+            matrix_D_sym[i,i] = 1.0 / np.sqrt(matrix_D[i,i])
+        matrix_L = matrix_D_sym.dot(matrix_L).dot(matrix_D_sym)
+
+    eigenvalues, eigenvectors = np.linalg.eig(matrix_L)
+    eigenvectors = eigenvectors.T
 #    np.save(cut+"eigenvalues"+str(pic)+".npy", eigenvalues)
 #    np.save(cut+"eigenvectors"+str(pic)+".npy", eigenvectors)
-    eigenvalues = np.load(cut+"eigenvalues"+str(pic)+".npy")
-    eigenvectors = np.load(cut+"eigenvectors"+str(pic)+".npy")
+#    eigenvalues = np.load(cut+"eigenvalues"+str(pic)+".npy")
+#    eigenvectors = np.load(cut+"eigenvectors"+str(pic)+".npy")
 
     # sort eigenvalues and find indices of nonzero eigenvalues
     sort_idx = np.argsort(eigenvalues)
@@ -134,7 +131,6 @@ def computeMatrixU(matrix_W, cut_type, num_of_cluster):
         for i in range(len(T)):
             T[i] /= temp[i]
         matrix_U = T
-#    return eigenvectors[sort_idx[:num_of_cluster]].T
     return matrix_U
 
 
